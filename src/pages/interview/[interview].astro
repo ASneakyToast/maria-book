@@ -1,0 +1,223 @@
+---
+import { getInterviewFolders, getInterviewQuestions, getInterviewMetadata, getQuestionMetadata } from '../../utils/contentUtils';
+
+export async function getStaticPaths() {
+  const interviewFolders = await getInterviewFolders();
+  
+  return interviewFolders.map((folder) => ({
+    params: { interview: folder }
+  }));
+}
+
+const { interview } = Astro.params;
+
+// Load interview metadata
+const interviewMetadata = await getInterviewMetadata(interview);
+
+// Get all questions for this interview
+const questions = await getInterviewQuestions(interview);
+
+// Load metadata for each question
+const questionsWithMetadata = await Promise.all(
+  questions.map(async (questionFolder) => {
+    const metadata = await getQuestionMetadata(interview, questionFolder);
+    return metadata ? { folder: questionFolder, ...metadata } : { 
+      folder: questionFolder, 
+      question: 'Question unavailable', 
+      responseType: 'unknown' as const,
+      artist: 'Unknown',
+      interviewNumber: 0,
+      questionNumber: 0
+    };
+  })
+);
+
+if (!interviewMetadata) {
+  return Astro.redirect('/404');
+}
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{interviewMetadata.artistName} - {interviewMetadata.interviewTitle}</title>
+    <meta name="description" content={`Interview with ${interviewMetadata.artistName}: ${interviewMetadata.description || interviewMetadata.interviewTitle}`} />
+  </head>
+  <body>
+    <main class="interview-page">
+      <nav class="breadcrumb">
+        <a href="/">← Back to all interviews</a>
+      </nav>
+      
+      <header class="interview-header">
+        <h1>{interviewMetadata.artistName}</h1>
+        <h2>{interviewMetadata.interviewTitle}</h2>
+        {interviewMetadata.description && <p class="description">{interviewMetadata.description}</p>}
+      </header>
+      
+      <section class="questions-grid">
+        {questionsWithMetadata.map((question, index) => (
+          <article class="question-card" key={question.folder}>
+            <a href={`/interview/${interview}/${question.folder}`} class="question-link">
+              <div class="question-number">Q{index + 1}</div>
+              <h3 class="question-text">{question.question}</h3>
+              <div class="response-info">
+                <span class="response-type">{question.responseType}</span>
+              </div>
+            </a>
+          </article>
+        ))}
+      </section>
+    </main>
+    
+    <style>
+      body {
+        margin: 0;
+        font-family: system-ui, sans-serif;
+        background: #fafafa;
+      }
+      
+      .interview-page {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 2rem;
+      }
+      
+      .breadcrumb {
+        margin-bottom: 2rem;
+      }
+      
+      .breadcrumb a {
+        color: #666;
+        text-decoration: none;
+        font-size: 0.9rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      
+      .breadcrumb a:hover {
+        color: #333;
+      }
+      
+      .interview-header {
+        text-align: center;
+        margin-bottom: 4rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid #eee;
+      }
+      
+      .interview-header h1 {
+        font-size: 2.5rem;
+        margin: 0 0 0.5rem 0;
+        color: #333;
+      }
+      
+      .interview-header h2 {
+        font-size: 1.3rem;
+        margin: 0 0 1rem 0;
+        color: #666;
+        font-weight: normal;
+      }
+      
+      .description {
+        font-size: 1.1rem;
+        color: #888;
+        line-height: 1.6;
+        max-width: 600px;
+        margin: 0 auto;
+      }
+      
+      .questions-grid {
+        display: grid;
+        gap: 1.5rem;
+      }
+      
+      .question-card {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+      
+      .question-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      }
+      
+      .question-link {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        padding: 1.5rem;
+        text-decoration: none;
+        color: inherit;
+      }
+      
+      .question-number {
+        flex-shrink: 0;
+        width: 3rem;
+        height: 3rem;
+        background: #f0f0f0;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: #666;
+      }
+      
+      .question-text {
+        flex: 1;
+        margin: 0;
+        font-size: 1.1rem;
+        color: #333;
+        line-height: 1.4;
+      }
+      
+      .response-info {
+        flex-shrink: 0;
+      }
+      
+      .response-type {
+        background: #e8f4f8;
+        color: #2c5aa0;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        text-transform: capitalize;
+      }
+      
+      @media (max-width: 768px) {
+        .question-link {
+          flex-direction: column;
+          text-align: center;
+          gap: 1rem;
+        }
+        
+        .interview-header h1 {
+          font-size: 2rem;
+        }
+      }
+    </style>
+    
+    <script>
+      // Add entrance animation using anime.js
+      import * as anime from 'animejs';
+      
+      // Animate question cards on page load
+      anime.default({
+        targets: '.question-card',
+        translateY: [50, 0],
+        opacity: [0, 1],
+        delay: anime.default.stagger(100),
+        duration: 800,
+        easing: 'easeOutExpo'
+      });
+    </script>
+  </body>
+</html>

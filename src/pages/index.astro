@@ -1,5 +1,18 @@
 ---
+import { getInterviewFolders, getInterviewMetadata } from '../utils/contentUtils';
 
+// Get all interview folders during build
+const interviewFolders = await getInterviewFolders();
+
+// Load metadata for each interview
+const interviews = await Promise.all(
+  interviewFolders.map(async (folder) => {
+    const metadata = await getInterviewMetadata(folder);
+    return metadata ? { folder, ...metadata } : null;
+  })
+);
+
+const validInterviews = interviews.filter(Boolean);
 ---
 
 <html lang="en">
@@ -8,9 +21,198 @@
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
+		<title>Interactive Artbook</title>
+		<meta name="description" content="An interactive digital artbook featuring artist interviews and creative responses" />
+		<link rel="stylesheet" href="/src/styles/global.css" />
 	</head>
 	<body>
-		<h1>Astro</h1>
+		<main class="artbook-home">
+			<header class="page-header hero">
+				<div class="container">
+					<h1 class="serif">Interactive Artbook</h1>
+					<p class="text-large text-muted">Explore creative conversations through visual storytelling</p>
+				</div>
+			</header>
+			
+			<section class="interviews-section">
+				<div class="container">
+					<div class="interviews-grid stagger-children">
+						{validInterviews.map((interview, index) => (
+							<article class="interview-card card fade-in" key={interview.folder} style={`animation-delay: ${index * 0.1}s`}>
+								<a href={`/interview/${interview.folder}`} class="interview-link">
+									<div class="interview-content">
+										<h2 class="serif">{interview.artistName}</h2>
+										<h3 class="interview-subtitle">{interview.interviewTitle}</h3>
+										<p class="interview-description">{interview.description}</p>
+										<div class="interview-meta">
+											<span class="question-count">{interview.totalQuestions} questions</span>
+											<span class="view-arrow">→</span>
+										</div>
+									</div>
+								</a>
+							</article>
+						))}
+					</div>
+				</div>
+			</section>
+		</main>
+		
+		<style>
+			/* Page-specific styles */
+			.artbook-home {
+				min-height: 100vh;
+			}
+			
+			.hero {
+				padding: var(--space-3xl) 0;
+				text-align: center;
+				background: linear-gradient(135deg, var(--color-warm-white) 0%, var(--color-soft-gray) 100%);
+				margin-bottom: var(--space-3xl);
+			}
+			
+			.hero h1 {
+				margin-bottom: var(--space-lg);
+				background: linear-gradient(135deg, var(--color-black) 0%, var(--color-accent-blue) 100%);
+				-webkit-background-clip: text;
+				-webkit-text-fill-color: transparent;
+				background-clip: text;
+			}
+			
+			.interviews-section {
+				padding: 0 0 var(--space-3xl) 0;
+			}
+			
+			.interviews-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+				gap: var(--space-2xl);
+				margin-top: var(--space-2xl);
+			}
+			
+			.interview-card {
+				position: relative;
+				overflow: hidden;
+				border: 1px solid rgba(139, 134, 128, 0.1);
+			}
+			
+			.interview-card::before {
+				content: '';
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				height: 4px;
+				background: linear-gradient(90deg, var(--color-accent-gold), var(--color-accent-rust), var(--color-accent-sage));
+				opacity: 0;
+				transition: opacity var(--transition-medium);
+			}
+			
+			.interview-card:hover::before {
+				opacity: 1;
+			}
+			
+			.interview-link {
+				display: block;
+				padding: var(--space-2xl);
+				text-decoration: none;
+				color: inherit;
+				height: 100%;
+			}
+			
+			.interview-content {
+				height: 100%;
+				display: flex;
+				flex-direction: column;
+			}
+			
+			.interview-content h2 {
+				margin-bottom: var(--space-sm);
+				font-size: 1.75rem;
+				color: var(--color-black);
+				transition: color var(--transition-fast);
+			}
+			
+			.interview-subtitle {
+				margin-bottom: var(--space-lg);
+				font-size: 1.1rem;
+				color: var(--color-medium-gray);
+				font-weight: 400;
+				font-style: italic;
+			}
+			
+			.interview-description {
+				margin-bottom: var(--space-lg);
+				color: var(--color-dark-gray);
+				line-height: 1.6;
+				flex: 1;
+			}
+			
+			.interview-meta {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin-top: auto;
+			}
+			
+			.question-count {
+				background: var(--color-soft-gray);
+				color: var(--color-medium-gray);
+				padding: var(--space-xs) var(--space-md);
+				border-radius: 20px;
+				font-size: 0.85rem;
+				font-weight: 500;
+				letter-spacing: 0.025em;
+			}
+			
+			.view-arrow {
+				font-size: 1.25rem;
+				color: var(--color-accent-blue);
+				transition: transform var(--transition-fast);
+			}
+			
+			.interview-card:hover .view-arrow {
+				transform: translateX(4px);
+			}
+			
+			.interview-card:hover h2 {
+				color: var(--color-accent-blue);
+			}
+			
+			/* Enhanced animations */
+			.fade-in {
+				animation: fadeInUp 0.8s ease forwards;
+			}
+			
+			@keyframes fadeInUp {
+				from {
+					opacity: 0;
+					transform: translateY(30px);
+				}
+				to {
+					opacity: 1;
+					transform: translateY(0);
+				}
+			}
+			
+			/* Responsive adjustments */
+			@media (max-width: 768px) {
+				.interviews-grid {
+					grid-template-columns: 1fr;
+					gap: var(--space-lg);
+				}
+				
+				.hero {
+					padding: var(--space-2xl) 0;
+				}
+				
+				.interview-link {
+					padding: var(--space-lg);
+				}
+				
+				.interview-content h2 {
+					font-size: 1.5rem;
+				}
+			}
+		</style>
 	</body>
 </html>

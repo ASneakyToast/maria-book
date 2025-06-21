@@ -1,0 +1,440 @@
+---
+import { getInterviewFolders, getInterviewQuestions, getInterviewMetadata, getQuestionMetadata } from '../../../utils/contentUtils';
+
+export async function getStaticPaths() {
+  const interviewFolders = await getInterviewFolders();
+  const paths = [];
+  
+  for (const interviewFolder of interviewFolders) {
+    const questions = await getInterviewQuestions(interviewFolder);
+    for (const questionFolder of questions) {
+      paths.push({
+        params: { 
+          interview: interviewFolder,
+          question: questionFolder
+        }
+      });
+    }
+  }
+  
+  return paths;
+}
+
+const { interview, question } = Astro.params;
+
+// Load interview metadata
+const interviewMetadata = await getInterviewMetadata(interview);
+
+// Load question metadata
+const questionMetadata = await getQuestionMetadata(interview, question);
+
+// Get all questions for navigation
+const allQuestions = await getInterviewQuestions(interview);
+const currentIndex = allQuestions.indexOf(question);
+const prevQuestion = currentIndex > 0 ? allQuestions[currentIndex - 1] : null;
+const nextQuestion = currentIndex < allQuestions.length - 1 ? allQuestions[currentIndex + 1] : null;
+
+if (!interviewMetadata || !questionMetadata) {
+  return Astro.redirect('/404');
+}
+
+// Find available image files (common formats)
+const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+const responsePath = `/interviews/${interview}/${question}/response`;
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{questionMetadata.question} - {interviewMetadata.artistName}</title>
+    <meta name="description" content={`${interviewMetadata.artistName}'s ${questionMetadata.responseType} response to: ${questionMetadata.question}`} />
+  </head>
+  <body>
+    <main class="question-page">
+      <nav class="breadcrumb">
+        <a href="/">All interviews</a>
+        <span class="separator">→</span>
+        <a href={`/interview/${interview}`}>{interviewMetadata.artistName}</a>
+        <span class="separator">→</span>
+        <span>Question {questionMetadata.questionNumber}</span>
+      </nav>
+      
+      <article class="question-content">
+        <header class="question-header">
+          <div class="question-info">
+            <span class="question-number">Q{questionMetadata.questionNumber}</span>
+            <div class="response-type-badge">{questionMetadata.responseType}</div>
+          </div>
+          <h1 class="question-text">{questionMetadata.question}</h1>
+          <p class="artist-name">Response by {questionMetadata.artist}</p>
+        </header>
+        
+        <section class="response-container">
+          <div class="image-wrapper">
+            <img 
+              src={`${responsePath}.svg`} 
+              alt={`${questionMetadata.artist}'s ${questionMetadata.responseType} response`}
+              class="response-image"
+              loading="lazy"
+              onerror="this.src='${responsePath}.jpg'"
+            />
+          </div>
+        </section>
+        
+        <nav class="question-navigation">
+          {prevQuestion && (
+            <a href={`/interview/${interview}/${prevQuestion}`} class="nav-button prev">
+              <span class="nav-arrow">←</span>
+              <span class="nav-text">Previous</span>
+            </a>
+          )}
+          
+          <a href={`/interview/${interview}`} class="nav-button overview">
+            <span class="nav-text">All Questions</span>
+          </a>
+          
+          {nextQuestion && (
+            <a href={`/interview/${interview}/${nextQuestion}`} class="nav-button next">
+              <span class="nav-text">Next</span>
+              <span class="nav-arrow">→</span>
+            </a>
+          )}
+        </nav>
+      </article>
+      
+      <div class="nav-hint" id="navHint">
+        Use ← → arrows or h/l keys to navigate • Click image to zoom • ESC to go home
+      </div>
+    </main>
+    
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      
+      body {
+        margin: 0;
+        font-family: system-ui, sans-serif;
+        background: #fafafa;
+        line-height: 1.6;
+      }
+      
+      .question-page {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+      }
+      
+      .breadcrumb {
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+        color: #666;
+      }
+      
+      .breadcrumb a {
+        color: #666;
+        text-decoration: none;
+      }
+      
+      .breadcrumb a:hover {
+        color: #333;
+      }
+      
+      .separator {
+        color: #ccc;
+      }
+      
+      .question-content {
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      }
+      
+      .question-header {
+        padding: 3rem 3rem 2rem 3rem;
+        text-align: center;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      }
+      
+      .question-info {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+      }
+      
+      .question-number {
+        background: #007acc;
+        color: white;
+        width: 3rem;
+        height: 3rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1.1rem;
+      }
+      
+      .response-type-badge {
+        background: #e8f4f8;
+        color: #2c5aa0;
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        font-size: 0.9rem;
+        text-transform: capitalize;
+        font-weight: 500;
+      }
+      
+      .question-text {
+        font-size: 1.8rem;
+        margin: 0 0 1rem 0;
+        color: #333;
+        line-height: 1.3;
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      
+      .artist-name {
+        font-size: 1.1rem;
+        color: #666;
+        margin: 0;
+        font-style: italic;
+      }
+      
+      .response-container {
+        padding: 2rem;
+        display: flex;
+        justify-content: center;
+      }
+      
+      .image-wrapper {
+        max-width: 100%;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+        border-radius: 8px;
+        overflow: hidden;
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      
+      .response-image {
+        width: 100%;
+        height: auto;
+        display: block;
+        max-height: 80vh;
+        object-fit: contain;
+      }
+      
+      .question-navigation {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 2rem 3rem;
+        background: #f8f9fa;
+        border-top: 1px solid #e9ecef;
+      }
+      
+      .nav-button {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        background: #007acc;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        min-width: 100px;
+        justify-content: center;
+      }
+      
+      .nav-button:hover {
+        background: #005a99;
+        transform: translateY(-1px);
+      }
+      
+      .nav-button.overview {
+        background: #6c757d;
+      }
+      
+      .nav-button.overview:hover {
+        background: #5a6268;
+      }
+      
+      .nav-arrow {
+        font-size: 1.2rem;
+      }
+      
+      /* Image zoom functionality */
+      .response-image {
+        cursor: zoom-in;
+        transition: transform 0.5s ease;
+      }
+      
+      .response-image.zoomed {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(1.5);
+        z-index: 1000;
+        cursor: zoom-out;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+        border-radius: 8px;
+        max-width: 90vw;
+        max-height: 90vh;
+      }
+      
+      body.image-zoomed {
+        overflow: hidden;
+      }
+      
+      body.image-zoomed::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 999;
+        backdrop-filter: blur(4px);
+      }
+      
+      /* Progress indicators */
+      .question-card.completed::after {
+        content: '✓';
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: #28a745;
+        color: white;
+        width: 1.5rem;
+        height: 1.5rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        font-weight: bold;
+      }
+      
+      /* Keyboard navigation hint */
+      .nav-hint {
+        position: fixed;
+        bottom: 1rem;
+        right: 1rem;
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        z-index: 100;
+      }
+      
+      .nav-hint.show {
+        opacity: 1;
+      }
+      
+      @media (max-width: 768px) {
+        .question-page {
+          padding: 1rem;
+        }
+        
+        .question-header {
+          padding: 2rem 1.5rem 1.5rem 1.5rem;
+        }
+        
+        .question-text {
+          font-size: 1.4rem;
+        }
+        
+        .question-navigation {
+          padding: 1.5rem;
+          flex-wrap: wrap;
+          gap: 1rem;
+        }
+        
+        .nav-button {
+          flex: 1;
+          min-width: auto;
+        }
+        
+        .question-info {
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+      }
+      
+      @media (max-width: 480px) {
+        .breadcrumb {
+          flex-wrap: wrap;
+        }
+        
+        .question-navigation {
+          flex-direction: column;
+        }
+        
+        .nav-button {
+          width: 100%;
+        }
+      }
+    </style>
+    
+    <script>
+      // Add entrance animation using anime.js
+      import * as anime from 'animejs';
+      import { initializeNavigation, initializeImageInteractions, initializeProgressTracking } from '../../../scripts/navigation.js';
+      
+      // Animate image entrance
+      anime.default({
+        targets: '.image-wrapper',
+        opacity: [0, 1],
+        translateY: [20, 0],
+        duration: 1000,
+        easing: 'easeOutExpo',
+        delay: 300
+      });
+      
+      // Initialize enhanced interactions
+      document.addEventListener('DOMContentLoaded', () => {
+        initializeNavigation();
+        initializeImageInteractions();
+        initializeProgressTracking();
+      });
+      
+      // Add subtle parallax effect on scroll
+      let ticking = false;
+      
+      function updateParallax() {
+        const scrolled = window.pageYOffset;
+        const parallax = document.querySelector('.image-wrapper');
+        if (parallax) {
+          const speed = scrolled * 0.1;
+          parallax.style.transform = `translateY(${speed}px)`;
+        }
+        ticking = false;
+      }
+      
+      function requestTick() {
+        if (!ticking) {
+          requestAnimationFrame(updateParallax);
+          ticking = true;
+        }
+      }
+      
+      window.addEventListener('scroll', requestTick);
+    </script>
+  </body>
+</html>
