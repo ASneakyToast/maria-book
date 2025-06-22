@@ -26,191 +26,232 @@ const validInterviews = interviews.filter(Boolean);
 		<link rel="stylesheet" href="/src/styles/global.css" />
 	</head>
 	<body>
-		<main class="artbook-home">
-			<header class="page-header hero">
-				<div class="container">
-					<h1 class="serif">Interactive Artbook</h1>
-					<p class="text-large text-muted">Explore creative conversations through visual storytelling</p>
-				</div>
-			</header>
-			
-			<section class="interviews-section">
-				<div class="container">
-					<div class="interviews-grid stagger-children">
-						{validInterviews.map((interview, index) => (
-							<article class="interview-card card fade-in" key={interview.folder} style={`animation-delay: ${index * 0.1}s`}>
-								<a href={`/interview/${interview.folder}`} class="interview-link">
-									<div class="interview-content">
-										<h2 class="serif">{interview.artistName}</h2>
-										<h3 class="interview-subtitle">{interview.interviewTitle}</h3>
-										<p class="interview-description">{interview.description}</p>
-										<div class="interview-meta">
-											<span class="question-count">{interview.totalQuestions} questions</span>
-											<span class="view-arrow">→</span>
-										</div>
-									</div>
-								</a>
-							</article>
-						))}
+		<main class="book-cover-home">
+			<div class="book-container">
+				<!-- Back Cover (Left on desktop, bottom on mobile) -->
+				<div class="book-back">
+					<div class="back-content">
+						
+						<div class="back-text">
+							<div class="main-description">
+								<p>About Us Through Others is an interview-based publication series that uses meaningful questions to explore the lives and practices of inspiring artists and designers. The questions are crafted to uncover personal stories, philosophies, and unique creative processes.</p>
+							</div>
+							
+							<div class="publisher-info">
+								<div class="credits">
+									<p>Project by Maria Cardenas, 2023 and ongoing.</p>
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
-			</section>
+
+				<!-- Front Cover (Right on desktop, top on mobile) -->
+				<div class="book-front">
+					<div class="front-content">
+						<header class="book-title">
+							<h1 class="main-title">About Us Through Others</h1>
+							<p class="subtitle">Conversations in Creative Expression</p>
+						</header>
+						
+						<nav class="roster">
+							<ul class="name-list">
+								<li><a href="/person/maria-gonzalez" class="name-link">Maria Gonzalez</a></li>
+								<li><a href="/person/james-chen" class="name-link">James Chen</a></li>
+								<li><a href="/person/aisha-patel" class="name-link">Aisha Patel</a></li>
+								<li><a href="/person/david-thompson" class="name-link">David Thompson</a></li>
+								<li><a href="/person/sophia-rodriguez" class="name-link">Sophia Rodriguez</a></li>
+								<li><a href="/person/michael-kim" class="name-link">Michael Kim</a></li>
+								<li><a href="/person/elena-petrova" class="name-link">Elena Petrova</a></li>
+								<li><a href="/person/carlos-santos" class="name-link">Carlos Santos</a></li>
+								<li><a href="/person/fatima-hassan" class="name-link">Fatima Hassan</a></li>
+								<li><a href="/person/noah-williams" class="name-link">Noah Williams</a></li>
+							</ul>
+						</nav>
+						
+						<div class="front-footer">
+							<p class="edition-info">Digital Interactive Edition</p>
+						</div>
+					</div>
+				</div>
+			</div>
 		</main>
 		
 		<style>
-			/* Page-specific styles */
-			.artbook-home {
+			/* Book Cover Styles */
+			.book-cover-home {
+				min-height: 100vh;
+				background: linear-gradient(135deg, var(--color-soft-gray) 0%, var(--color-cream) 50%, var(--color-warm-white) 100%);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+			
+			.book-container {
+				width: 100%;
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 0;
 				min-height: 100vh;
 			}
 			
-			.hero {
-				padding: var(--space-3xl) 0;
-				text-align: center;
-				background: linear-gradient(135deg, var(--color-warm-white) 0%, var(--color-soft-gray) 100%);
-				margin-bottom: var(--space-3xl);
-			}
-			
-			.hero h1 {
-				margin-bottom: var(--space-lg);
-				background: linear-gradient(135deg, var(--color-black) 0%, var(--color-accent-blue) 100%);
-				-webkit-background-clip: text;
-				-webkit-text-fill-color: transparent;
-				background-clip: text;
-			}
-			
-			.interviews-section {
-				padding: 0 0 var(--space-3xl) 0;
-			}
-			
-			.interviews-grid {
-				display: grid;
-				grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
-				gap: var(--space-2xl);
-				margin-top: var(--space-2xl);
-			}
-			
-			.interview-card {
+			/* Back Cover Styles */
+			.book-back {
+				background: linear-gradient(135deg, var(--color-warm-white) 0%, var(--color-cream) 100%);
 				position: relative;
 				overflow: hidden;
-				border: 1px solid rgba(139, 134, 128, 0.1);
 			}
 			
-			.interview-card::before {
-				content: '';
-				position: absolute;
-				top: 0;
-				left: 0;
-				right: 0;
-				height: 4px;
-				background: linear-gradient(90deg, var(--color-accent-gold), var(--color-accent-rust), var(--color-accent-sage));
-				opacity: 0;
-				transition: opacity var(--transition-medium);
-			}
-			
-			.interview-card:hover::before {
-				opacity: 1;
-			}
-			
-			.interview-link {
-				display: block;
-				padding: var(--space-2xl);
-				text-decoration: none;
-				color: inherit;
+			.back-content {
 				height: 100%;
+				padding: var(--space-3xl);
+				display: flex;
+				flex-direction: column;
+				justify-content: space-between;
+				position: relative;
 			}
 			
-			.interview-content {
+			
+			.back-text {
+				position: relative;
+				z-index: 2;
 				height: 100%;
 				display: flex;
 				flex-direction: column;
+				justify-content: space-between;
+				align-items: flex-start;
 			}
 			
-			.interview-content h2 {
-				margin-bottom: var(--space-sm);
-				font-size: 1.75rem;
-				color: var(--color-black);
-				transition: color var(--transition-fast);
+			.main-description {
+				text-align: left;
+				margin-bottom: var(--space-2xl);
 			}
 			
-			.interview-subtitle {
-				margin-bottom: var(--space-lg);
+			.main-description p {
 				font-size: 1.1rem;
-				color: var(--color-medium-gray);
-				font-weight: 400;
-				font-style: italic;
+				line-height: 1.6;
+				color: var(--color-charcoal);
+				margin: 0;
 			}
 			
-			.interview-description {
-				margin-bottom: var(--space-lg);
-				color: var(--color-dark-gray);
-				line-height: 1.6;
+			
+			.publisher-info {
+				text-align: center;
+				width: 100%;
+			}
+			
+			.credits {
+				color: var(--color-medium-gray);
+				font-size: 0.9rem;
+				line-height: 1.4;
+			}
+			
+			.credits strong {
+				color: var(--color-charcoal);
+			}
+			
+			/* Front Cover Styles */
+			.book-front {
+				background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+				position: relative;
+			}
+			
+			.front-content {
+				height: 100%;
+				padding: var(--space-3xl);
+				display: flex;
+				flex-direction: column;
+				justify-content: space-between;
+			}
+			
+			.book-title {
+				text-align: left;
+				margin-bottom: var(--space-2xl);
+			}
+			
+			.main-title {
+				font-family: "Times New Roman", Times, serif;
+				font-size: clamp(2.5rem, 5vw, 3.5rem);
+				font-weight: 600;
+				letter-spacing: -0.02em;
+				color: var(--color-warm-white);
+				margin-bottom: var(--space-md);
+			}
+			
+			.subtitle {
+				font-size: 1.2rem;
+				color: rgba(255, 255, 255, 0.8);
+				font-style: italic;
+				margin: 0;
+			}
+			
+			.roster {
 				flex: 1;
 			}
 			
-			.interview-meta {
-				display: flex;
-				justify-content: space-between;
-				align-items: center;
-				margin-top: auto;
+			.name-list {
+				list-style: none;
+				padding: 0;
+				margin: 0;
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: var(--space-md) var(--space-lg);
 			}
 			
-			.question-count {
-				background: var(--color-soft-gray);
-				color: var(--color-medium-gray);
-				padding: var(--space-xs) var(--space-md);
-				border-radius: 20px;
-				font-size: 0.85rem;
-				font-weight: 500;
-				letter-spacing: 0.025em;
+			.name-link {
+				display: block;
+				text-decoration: none;
+				color: var(--color-warm-white);
+				font-size: 1.1rem;
+				font-weight: 400;
+				padding: var(--space-sm);
+				border-radius: var(--border-radius);
+				transition: all var(--transition-medium);
 			}
 			
-			.view-arrow {
-				font-size: 1.25rem;
-				color: var(--color-accent-blue);
-				transition: transform var(--transition-fast);
-			}
-			
-			.interview-card:hover .view-arrow {
+			.name-link:hover {
+				background: rgba(255, 255, 255, 0.1);
 				transform: translateX(4px);
+				color: var(--color-warm-white);
 			}
 			
-			.interview-card:hover h2 {
-				color: var(--color-accent-blue);
+			.front-footer {
+				text-align: center;
+				margin-top: var(--space-lg);
 			}
 			
-			/* Enhanced animations */
-			.fade-in {
-				animation: fadeInUp 0.8s ease forwards;
+			.edition-info {
+				color: rgba(255, 255, 255, 0.6);
+				font-size: 0.9rem;
+				font-style: italic;
+				margin: 0;
 			}
 			
-			@keyframes fadeInUp {
-				from {
-					opacity: 0;
-					transform: translateY(30px);
-				}
-				to {
-					opacity: 1;
-					transform: translateY(0);
-				}
-			}
-			
-			/* Responsive adjustments */
+			/* Responsive Design */
 			@media (max-width: 768px) {
-				.interviews-grid {
+				.book-container {
 					grid-template-columns: 1fr;
+					grid-template-rows: auto auto;
 					gap: var(--space-lg);
+					min-height: auto;
 				}
 				
-				.hero {
-					padding: var(--space-2xl) 0;
+				.book-front {
+					order: -1;
 				}
 				
-				.interview-link {
-					padding: var(--space-lg);
+				.back-content,
+				.front-content {
+					padding: var(--space-2xl);
 				}
 				
-				.interview-content h2 {
-					font-size: 1.5rem;
+				.main-title {
+					font-size: clamp(2rem, 8vw, 2.5rem);
+				}
+				
+				.name-list {
+					grid-template-columns: 1fr;
+					gap: var(--space-sm);
 				}
 			}
 		</style>
