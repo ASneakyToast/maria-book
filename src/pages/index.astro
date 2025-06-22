@@ -56,16 +56,13 @@ const validInterviews = interviews.filter(Boolean);
 						
 						<nav class="roster">
 							<ul class="name-list">
-								<li><a href="/person/maria-gonzalez" class="name-link">Maria Gonzalez</a></li>
-								<li><a href="/person/james-chen" class="name-link">James Chen</a></li>
-								<li><a href="/person/aisha-patel" class="name-link">Aisha Patel</a></li>
-								<li><a href="/person/david-thompson" class="name-link">David Thompson</a></li>
-								<li><a href="/person/sophia-rodriguez" class="name-link">Sophia Rodriguez</a></li>
-								<li><a href="/person/michael-kim" class="name-link">Michael Kim</a></li>
-								<li><a href="/person/elena-petrova" class="name-link">Elena Petrova</a></li>
-								<li><a href="/person/carlos-santos" class="name-link">Carlos Santos</a></li>
-								<li><a href="/person/fatima-hassan" class="name-link">Fatima Hassan</a></li>
-								<li><a href="/person/noah-williams" class="name-link">Noah Williams</a></li>
+								{validInterviews.map((interview) => (
+									<li key={interview.folder}>
+										<a href={`/interview/${interview.folder}`} class="name-link">
+											{interview.artistName}
+										</a>
+									</li>
+								))}
 							</ul>
 						</nav>
 						
@@ -125,11 +122,14 @@ const validInterviews = interviews.filter(Boolean);
 			.main-description {
 				text-align: left;
 				margin-bottom: var(--space-2xl);
+				width: 50%;
 			}
 			
 			.main-description p {
-				font-size: 1.1rem;
-				line-height: 1.6;
+				font-family: Arial, sans-serif;
+				font-size: 0.9rem;
+				letter-spacing: 2pt;
+				line-height: 1.2;
 				color: var(--color-charcoal);
 				margin: 0;
 			}
@@ -140,10 +140,13 @@ const validInterviews = interviews.filter(Boolean);
 				width: 100%;
 			}
 			
-			.credits {
-				color: var(--color-medium-gray);
+			.credits p {
+				font-family: Arial, sans-serif;
 				font-size: 0.9rem;
-				line-height: 1.4;
+				letter-spacing: 2pt;
+				line-height: 1.2;
+				color: var(--color-charcoal);
+				margin: 0;
 			}
 			
 			.credits strong {
@@ -179,7 +182,10 @@ const validInterviews = interviews.filter(Boolean);
 			}
 			
 			.subtitle {
-				font-size: 1.2rem;
+				font-family: Arial, sans-serif;
+				font-size: 0.9rem;
+				letter-spacing: 2pt;
+				line-height: 1.2;
 				color: rgba(255, 255, 255, 0.8);
 				font-style: italic;
 				margin: 0;
@@ -202,8 +208,12 @@ const validInterviews = interviews.filter(Boolean);
 				display: block;
 				text-decoration: none;
 				color: var(--color-warm-white);
-				font-size: 1.1rem;
+				font-family: Arial, sans-serif;
+				font-size: 0.9rem;
+				letter-spacing: 2pt;
+				line-height: 1.2;
 				font-weight: 400;
+				margin: 0;
 				padding: var(--space-sm);
 				border-radius: var(--border-radius);
 				transition: all var(--transition-medium);
@@ -221,8 +231,11 @@ const validInterviews = interviews.filter(Boolean);
 			}
 			
 			.edition-info {
-				color: rgba(255, 255, 255, 0.6);
+				font-family: Arial, sans-serif;
 				font-size: 0.9rem;
+				letter-spacing: 2pt;
+				line-height: 1.2;
+				color: rgba(255, 255, 255, 0.6);
 				font-style: italic;
 				margin: 0;
 			}

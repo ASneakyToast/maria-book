@@ -17,6 +17,7 @@ export interface QuestionMetadata {
   questionNumber: number;
 }
 
+
 /**
  * Get all interview folders from the public/interviews directory
  */
@@ -82,3 +83,4 @@ export async function getInterviewQuestions(interviewFolder: string): Promise<st
     return [];
   }
 }
+
