@@ -1,5 +1,6 @@
 ---
 import { getInterviewFolders, getInterviewMetadata } from '../utils/contentUtils';
+import '../styles/global.css';
 
 // Get all interview folders during build
 const interviewFolders = await getInterviewFolders();
@@ -23,7 +24,6 @@ const validInterviews = interviews.filter(Boolean);
 		<meta name="generator" content={Astro.generator} />
 		<title>Interactive Artbook</title>
 		<meta name="description" content="An interactive digital artbook featuring artist interviews and creative responses" />
-		<link rel="stylesheet" href="/src/styles/global.css" />
 	</head>
 	<body>
 		<main class="book-cover-home">

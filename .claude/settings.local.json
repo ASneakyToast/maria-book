@@ -6,7 +6,18 @@
       "Bash(npm run build:*)",
       "Bash(pkill:*)",
       "Bash(npm run dev:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(grep:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(gh auth:*)",
+      "Bash(gh repo create:*)",
+      "Bash(find:*)",
+      "Bash(ls:*)",
+      "Bash(ls:*)",
+      "WebFetch(domain:docs.netlify.com)",
+      "Bash(open:*)",
+      "WebFetch(domain:docs.anthropic.com)"
     ],
     "deny": []
   }

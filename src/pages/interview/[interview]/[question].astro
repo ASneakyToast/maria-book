@@ -1,5 +1,6 @@
 ---
 import { getInterviewFolders, getInterviewQuestions, getInterviewMetadata, getQuestionMetadata } from '../../../utils/contentUtils';
+import '../../../styles/global.css';
 
 export async function getStaticPaths() {
   const interviewFolders = await getInterviewFolders();

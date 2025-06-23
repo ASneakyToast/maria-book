@@ -1,5 +1,6 @@
 ---
 import { getInterviewFolders, getInterviewQuestions, getInterviewMetadata, getQuestionMetadata } from '../../utils/contentUtils';
+import '../../styles/global.css';
 
 export async function getStaticPaths() {
   const interviewFolders = await getInterviewFolders();
@@ -45,7 +46,6 @@ if (!interviewMetadata) {
     <meta name="generator" content={Astro.generator} />
     <title>{interviewMetadata.artistName} - {interviewMetadata.interviewTitle}</title>
     <meta name="description" content={`Interview with ${interviewMetadata.artistName}: ${interviewMetadata.description || interviewMetadata.interviewTitle}`} />
-    <link rel="stylesheet" href="/src/styles/global.css" />
   </head>
   <body>
     <nav class="breadcrumb">
